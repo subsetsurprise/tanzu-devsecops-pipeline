@@ -17,11 +17,20 @@ cache:
 
 # Define the pipeline stages to be run
 stages:
-  - sast
   - build
+  - sast
   - deploy
   - dast
 
+# Build the jar to be used
+build:
+  stage: build
+  image:
+    name: openjdk:11-jdk
+  script: ./mvnw clean package
+  artifacts:
+    paths:
+      - target/demo-0.0.1-SNAPSHOT.jar
 # Run code quality checks on the SonarQube server
 sonarqube-check:
   stage: sast
@@ -29,18 +38,11 @@ sonarqube-check:
     name: sonarsource/sonar-scanner-cli:latest
   allow_failure: true
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=cdw-build
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=cdw-build -Dsonar.java.binaries=target/demo-0.0.1-SNAPSHOT.jar
   only:
     - merge_requests
     - master
-build:
-  stage: build
-  image:
-    name: openjdk:11-jdk
-  script: ./mvnw package
-  artifacts:
-    paths:
-      - target/demo-0.0.1-SNAPSHOT.jar
+
 # Deploy the app to the staging environment
 staging-deploy:
   stage: deploy
