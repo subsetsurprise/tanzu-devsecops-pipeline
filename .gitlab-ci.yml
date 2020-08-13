@@ -1,0 +1,69 @@
+variables:
+  SONAR_TOKEN: ebe2ea223c26b8dda8eb79c3237cf8b7d3ecbd96 # SonarQube project token
+  SONAR_HOST_URL: https://sonar.qc.on-target.tech # Base URL of SonarQube server
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
+  GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the sonar analysis task
+  DAST_WEBSITE: https://cdw-build.apps.tanzu.on-target.tech # Website to be scanned in the DAST stage
+  KUBERNETES_CPU_REQUEST: 2
+  KUBERNETES_CPU_LIMIT: 6
+  KUBERNETES_MEMORY_REQUEST: 8Gi
+  KUBERNETES_MEMORY_LIMIT: 16Gi
+
+# Setup a cache for SonarQube
+cache:
+  key: ${CI_JOB_NAME}
+  paths:
+    - .sonar/cache
+
+# Define the pipeline stages to be run
+stages:
+  - sast
+  - build
+  - deploy
+  - dast
+
+# Run code quality checks on the SonarQube server
+sonarqube-check:
+  stage: sast
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+  allow_failure: true
+  script:
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=cdw-build
+  only:
+    - merge_requests
+    - master
+build:
+  stage: build
+  image:
+    name: openjdk:11-jdk
+  script: ./mvnw package
+  artifacts:
+    paths:
+      - target/demo-0.0.1-SNAPSHOT.jar
+# Deploy the app to the staging environment
+staging-deploy:
+  stage: deploy
+  image:
+    name: openjdk:11-jdk
+  script:
+    - curl --location "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=7.0.2&source=github-rel" | tar zx
+    - ./cf api https://api.sys.tanzu.on-target.tech
+    - ./cf auth tstacey@vmware.com $CF_PASSWORD
+    - ./cf target -o labs-canada -s tyler
+    - ./cf push -f manifest.yaml --strategy rolling
+  only:
+  - master
+
+# Check for OWASP Top 10 web app vulnerabilities and output an HTML report
+owasp-zap:
+  stage: dast
+  image:
+    name: owasp/zap2docker-weekly
+  allow_failure: true
+  script:
+    - mkdir /zap/wrk/
+    - zap-baseline.py -r report.html -t $DAST_WEBSITE || true
+    - cp /zap/wrk/report.html .
+  artifacts:
+    paths: ["report.html"]
