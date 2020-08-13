@@ -54,7 +54,7 @@ staging-deploy:
     - ./cf api https://api.sys.tanzu.on-target.tech
     - ./cf auth tstacey@vmware.com $CF_PASSWORD
     - ./cf target -o labs-canada -s tyler
-    - ./cf push -f manifest.yml --strategy rolling
+    - ./cf push -f manifest.yml
   only:
   - master
 
