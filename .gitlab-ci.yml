@@ -4,7 +4,7 @@ variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
   GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the sonar analysis task
   DAST_WEBSITE: $DAST_URL # Website to be scanned in the DAST stage
-  BUILD_PATH: target/demo-0.0.1-SNAPSHOT.jar
+  BUILD_PATH: target/demo-0.0.1-SNAPSHOT.jar # Artifact built by build stage
   KUBERNETES_CPU_REQUEST: 2
   KUBERNETES_CPU_LIMIT: 6
   KUBERNETES_MEMORY_REQUEST: 8Gi
@@ -55,7 +55,7 @@ staging-deploy:
     - ./cf api $CF_API
     - ./cf auth $CF_USER $CF_PASSWORD
     - ./cf target -o $CF_ORG -s $CF_SPACE
-    - ./cf push -f manifest.yml
+    - ./cf push -f manifest.yml --strategy rolling
   only:
   - master
 
