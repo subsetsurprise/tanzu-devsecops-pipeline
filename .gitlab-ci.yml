@@ -1,9 +1,10 @@
 variables:
-  SONAR_TOKEN: ebe2ea223c26b8dda8eb79c3237cf8b7d3ecbd96 # SonarQube project token
-  SONAR_HOST_URL: https://sonar.qc.on-target.tech # Base URL of SonarQube server
+  SONAR_TOKEN: $SONAR_API_TOKEN # SonarQube project token
+  SONAR_HOST_URL: $SONAR_URL # Base URL of SonarQube server
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
   GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the sonar analysis task
-  DAST_WEBSITE: https://cdw-build.apps.tanzu.on-target.tech # Website to be scanned in the DAST stage
+  DAST_WEBSITE: $DAST_URL # Website to be scanned in the DAST stage
+  BUILD_PATH: target/demo-0.0.1-SNAPSHOT.jar
   KUBERNETES_CPU_REQUEST: 2
   KUBERNETES_CPU_LIMIT: 6
   KUBERNETES_MEMORY_REQUEST: 8Gi
@@ -30,7 +31,7 @@ build:
   script: ./mvnw clean package
   artifacts:
     paths:
-      - target/demo-0.0.1-SNAPSHOT.jar
+      - $BUILD_PATH
 
 # Run code quality checks on the SonarQube server
 sonarqube-check:
@@ -39,7 +40,7 @@ sonarqube-check:
     name: sonarsource/sonar-scanner-cli:latest
   allow_failure: true
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=cdw-build -Dsonar.java.binaries=target/demo-0.0.1-SNAPSHOT.jar
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.java.binaries=$BUILD_PATH
   only:
     - merge_requests
     - master
@@ -51,9 +52,9 @@ staging-deploy:
     name: openjdk:11-jdk
   script:
     - curl --location "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=7.0.2&source=github-rel" | tar zx
-    - ./cf api https://api.sys.tanzu.on-target.tech
-    - ./cf auth tstacey@vmware.com $CF_PASSWORD
-    - ./cf target -o labs-canada -s tyler
+    - ./cf api $CF_API
+    - ./cf auth $CF_USER $CF_PASSWORD
+    - ./cf target -o $CF_ORG -s $CF_SPACE
     - ./cf push -f manifest.yml
   only:
   - master
