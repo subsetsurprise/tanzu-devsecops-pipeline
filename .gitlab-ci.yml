@@ -82,7 +82,6 @@ publish-report:
     name: openjdk:11-jdk
   script:
     - touch owasp/Staticfile
-    - echo $HTPASSWORD > owasp/Staticfile.auth
     - cp owasp/report.html owasp/index.html
     - curl --location "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=7.0.2&source=github-rel" | tar zx
     - ./cf api $CF_API
