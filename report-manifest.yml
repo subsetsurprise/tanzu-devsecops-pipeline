@@ -1,0 +1,10 @@
+applications:
+- name: app-report
+  memory: 1G
+  disk: 1G
+  instances: 1
+  random-route: false
+  path: owasp/
+  services: []
+  env:
+  buildpack: staticfile_buildpack

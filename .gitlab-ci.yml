@@ -22,6 +22,7 @@ stages:
   - sast
   - deploy
   - dast
+  - publish
 
 # Build the jar to be used
 build:
@@ -70,4 +71,18 @@ owasp-zap:
     - zap-baseline.py -r report.html -t $DAST_WEBSITE || true
     - cp /zap/wrk/report.html .
   artifacts:
-    paths: ["report.html"]
+    paths: ["owasp/report.html"]
+
+# Publish vulnerability report on app
+publish-report:
+  stage: publish
+  image:
+    name: openjdk:11-jdk
+  script:
+    - curl --location "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=7.0.2&source=github-rel" | tar zx
+    - ./cf api $CF_API
+    - ./cf auth $CF_USER $CF_PASSWORD
+    - ./cf target -o $CF_ORG -s $CF_SPACE
+    - ./cf push -f report-manifest.yml --strategy rolling
+  only:
+  - master
