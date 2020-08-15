@@ -69,7 +69,8 @@ owasp-zap:
   script:
     - mkdir /zap/wrk/
     - zap-baseline.py -r report.html -t $DAST_WEBSITE || true
-    - cp /zap/wrk/report.html .
+    - mkdir ./owasp
+    - cp /zap/wrk/report.html ./owasp/
   artifacts:
     paths: ["owasp/"]
 
