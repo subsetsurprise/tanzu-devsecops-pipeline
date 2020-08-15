@@ -10,11 +10,10 @@ variables:
   KUBERNETES_MEMORY_REQUEST: 8Gi
   KUBERNETES_MEMORY_LIMIT: 16Gi
 
-# Setup a cache for SonarQube
+# Setup a cache for SonarQube & App-Report
 cache:
   key: ${CI_JOB_NAME}
-  paths:
-    - .sonar/cache
+  paths: [".sonar/cache", "owasp/"]
 
 # Define the pipeline stages to be run
 stages:
@@ -84,7 +83,7 @@ publish-report:
   script:
     - touch owasp/Staticfile
     - echo $HTPASSWORD > owasp/Staticfile.auth
-    - mv owasp/report.html owasp/index.html
+    - cp owasp/report.html owasp/index.html
     - curl --location "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=7.0.2&source=github-rel" | tar zx
     - ./cf api $CF_API
     - ./cf auth $CF_USER $CF_PASSWORD
