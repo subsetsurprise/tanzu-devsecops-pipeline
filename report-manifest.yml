@@ -6,5 +6,4 @@ applications:
   random-route: false
   path: owasp/
   services: []
-  env:
   buildpack: staticfile_buildpack

@@ -71,11 +71,13 @@ owasp-zap:
     - zap-baseline.py -r report.html -t $DAST_WEBSITE || true
     - cp /zap/wrk/report.html .
   artifacts:
-    paths: ["owasp/report.html"]
+    paths: ["owasp/"]
 
 # Publish vulnerability report on app
 publish-report:
   stage: publish
+  dependencies:
+    - owasp-zap
   image:
     name: openjdk:11-jdk
   script:
