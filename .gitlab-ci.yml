@@ -71,9 +71,6 @@ owasp-zap:
     - zap-baseline.py -r report.html -t $DAST_WEBSITE || true
     - mkdir ./owasp
     - cp /zap/wrk/report.html ./owasp/
-    - touch owasp/Staticfile
-    - touch owasp/Staticfile.auth
-    - echo $HTPASSWORD >> owasp/Staticfile.auth
   artifacts:
     paths: ["owasp/"]
 
@@ -85,6 +82,9 @@ publish-report:
   image:
     name: openjdk:11-jdk
   script:
+    - touch owasp/Staticfile
+    - touch owasp/Staticfile.auth
+    - echo $HTPASSWORD >> owasp/Staticfile.auth
     - curl --location "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=7.0.2&source=github-rel" | tar zx
     - ./cf api $CF_API
     - ./cf auth $CF_USER $CF_PASSWORD
