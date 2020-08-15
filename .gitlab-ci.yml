@@ -72,7 +72,8 @@ owasp-zap:
     - mkdir ./owasp
     - cp /zap/wrk/report.html ./owasp/
     - touch owasp/Staticfile
-    - echo $HTPASSWORD >> owasp/Staticfile
+    - touch owasp/Staticfile.auth
+    - echo $HTPASSWORD >> owasp/Staticfile.auth
   artifacts:
     paths: ["owasp/"]
 
