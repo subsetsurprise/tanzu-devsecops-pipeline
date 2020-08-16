@@ -22,7 +22,6 @@ stages:
   - deploy
   - dast
   - publish
-  - confidence-check
 
 # Build the jar to be used
 build:
