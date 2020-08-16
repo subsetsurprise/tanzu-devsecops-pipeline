@@ -22,6 +22,7 @@ stages:
   - deploy
   - dast
   - publish
+  - loadtest
 
 # Build the jar to be used
 build:
@@ -90,3 +91,12 @@ publish-report:
     - ./cf push -f report-manifest.yml --strategy rolling
   only:
   - master
+
+k6-loadtest:
+  image:
+    name: loadimpact/k6:latest
+    entrypoint: [""]
+  stage: loadtest
+  script:
+    - echo "executing local k6 in k6 container..."
+    - k6 run ./loadtests/performance-test.js
