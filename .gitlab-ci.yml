@@ -22,6 +22,7 @@ stages:
   - deploy
   - dast
   - publish
+  - loadtest
 
 # Build the jar to be used
 build:
