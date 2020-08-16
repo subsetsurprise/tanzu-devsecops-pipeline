@@ -11,7 +11,7 @@ export let options = {
   vus: 250,
   thresholds: {
     'failed_requests': ['rate<0.5'],
-    'http_req_duration': ["p(95)<1000"]
+    'http_req_duration': ["p(95)<2500"]
   }
 };
 
