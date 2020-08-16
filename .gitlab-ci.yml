@@ -22,7 +22,7 @@ stages:
   - deploy
   - dast
   - publish
-  - loadtest
+  - confidence-check
 
 # Build the jar to be used
 build:
@@ -91,7 +91,7 @@ publish-report:
     - ./cf push -f report-manifest.yml --strategy rolling
   only:
   - master
-
+# Load test the app with 250 vu and k6.io
 k6-loadtest:
   image:
     name: loadimpact/k6:latest
