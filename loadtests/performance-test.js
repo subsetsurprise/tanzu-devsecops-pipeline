@@ -4,13 +4,13 @@ import { sleep } from "k6";
 import http from "k6/http";
 import { Rate } from 'k6/metrics';
 
-const myFailRate = new Rate('failed requests');
+const myFailRate = new Rate('failed_requests');
 
 export let options = {
   duration: "5m",
   vus: 250,
   thresholds: {
-    'failed requests': ['rate<0.1'],
+    'failed_requests': ['rate<0.1'],
     'http_req_duration': ["p(95)<500"]
   }
 };
