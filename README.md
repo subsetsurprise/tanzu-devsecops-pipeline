@@ -1,4 +1,4 @@
-# CDW-Build-Workshop
+# Tanzu-Build-Workshop
 
 ## Initialize Maven Wrapper
 mvn -N io.takari:maven:wrapper
