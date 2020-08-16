@@ -10,8 +10,8 @@ export let options = {
   duration: "5m",
   vus: 250,
   thresholds: {
-    'failed_requests': ['rate<0.1'],
-    'http_req_duration': ["p(95)<500"]
+    'failed_requests': ['rate<0.5'],
+    'http_req_duration': ["p(95)<1000"]
   }
 };
 
